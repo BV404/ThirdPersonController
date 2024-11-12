@@ -6,11 +6,15 @@ public class InputManager : MonoBehaviour
 {
     PlayerControls playerControls;
     Vector2 movementInput;
+    Vector2 cameraInput;
 
     public static InputManager instance;
 
     public float HorizontalInput { get { return movementInput.x; } } 
     public float VerticalInput { get { return movementInput.y; } }
+    public float MouseX { get { return cameraInput.x; } }
+    public float MouseY { get { return cameraInput.y; } }
+
 
     private void Awake()
     {
@@ -28,6 +32,8 @@ public class InputManager : MonoBehaviour
             playerControls = new PlayerControls();
             playerControls.PlayerMovement.Movement.performed += 
                 (i) => { movementInput = i.ReadValue<Vector2>(); };
+            playerControls.PlayerMovement.Camera.performed +=
+                (i) => { cameraInput = i.ReadValue<Vector2>(); };
         }
         playerControls.Enable();
     }

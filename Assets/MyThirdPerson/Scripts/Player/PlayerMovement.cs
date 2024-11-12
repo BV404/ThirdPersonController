@@ -18,7 +18,7 @@ public class PlayerMovement : MonoBehaviour
         rb = GetComponent<Rigidbody>();
     }
 
-    private void FixedUpdate()
+    public void HandleAllMovement()
     {
         HandleMovement();
         HandleRotation();
