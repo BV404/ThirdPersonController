@@ -25,7 +25,10 @@ public class CharacterAnimatorController : MonoBehaviour
     void Update()
     {
         HorizontalTarget = Mathf.Abs(InputManager.instance.HorizontalInput) > 0 ? 0.5f: 0f;
-        VerticalTarget = Mathf.Abs(InputManager.instance.VerticalInput) > 0 ? 0.5f : 0f;
+        if (InputManager.instance.IsSprinting)
+            VerticalTarget = 1;
+        else 
+            VerticalTarget = Mathf.Abs(InputManager.instance.VerticalInput) > 0 ? 0.5f : 0f;
 
         GoToTarget(ref horizontalParameter, HorizontalTarget);
         GoToTarget(ref verticalParameter, VerticalTarget);

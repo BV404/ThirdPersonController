@@ -8,8 +8,15 @@ public class PlayerMovement : MonoBehaviour
     Rigidbody rb;
     Vector3 moveDir = Vector3.zero;
     Quaternion targetRotation = Quaternion.identity;
-    [SerializeField] float movementSpeed;
+    float movementSpeed;
+    float initMovementSpeed = 0;
+    bool isGrounded;
+
+    [SerializeField] float walkingSpeed;
+    [SerializeField] float runningSpeed;
     [SerializeField] float rotationSpeed;
+    [SerializeField] float transitionSpeed;
+    [SerializeField] float gravitySpeed;
 
     // Start is called before the first frame update
     void Start()
@@ -22,6 +29,7 @@ public class PlayerMovement : MonoBehaviour
     {
         HandleMovement();
         HandleRotation();
+        HandleGravity();
     }
 
     private void HandleMovement()
@@ -30,7 +38,30 @@ public class PlayerMovement : MonoBehaviour
             cameraTransform.right * InputManager.instance.HorizontalInput;
         moveDir.Normalize();
         moveDir.y = 0;
-        rb.velocity = moveDir * movementSpeed;
+
+        if (moveDir != Vector3.zero)
+        {
+            if (InputManager.instance.IsSprinting)
+                movementSpeed = runningSpeed;
+            else movementSpeed = walkingSpeed;
+        }
+        else movementSpeed = 0f;
+
+
+        LerpToMovementSpeed();
+        rb.velocity = moveDir * initMovementSpeed;
+    }
+
+    private void LerpToMovementSpeed()
+    {
+        if (initMovementSpeed > movementSpeed)
+        {
+            initMovementSpeed -= transitionSpeed * Time.deltaTime;
+        }
+        else
+        {
+            initMovementSpeed += transitionSpeed * Time.deltaTime;
+        }
     }
 
     private void HandleRotation()
@@ -41,5 +72,28 @@ public class PlayerMovement : MonoBehaviour
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
 
         }
+    }
+
+    private void HandleGravity()
+    {
+        Vector3 currentVelocity = rb.velocity;
+        if (!isGrounded)
+        {
+            currentVelocity.y += -9.8f * gravitySpeed * Time.deltaTime;
+        }
+        else
+        {
+            currentVelocity.y = 0;
+        }
+        rb.velocity = currentVelocity;
+    }
+
+    private void OnCollisionStay(Collision collision)
+    {
+        isGrounded = true;
+    }
+    private void OnCollisionExit(Collision collision)
+    {
+        isGrounded = false;
     }
 }
